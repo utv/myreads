@@ -12,22 +12,20 @@ class Shelves extends React.Component {
     const shelves = [
       { id: "wantToRead", title: "Want to Read" },
       { id: "currentlyReading", title: "Currently Reading" },
-      { id: "read", title: "Want to Read" },
+      { id: "read", title: "Read" },
       { id: "none", title: "None" }
     ]
     return (
       <div className="list-books-content">
         <div>
-          {
-            shelves.filter(shelf => shelf.id !== "none").map(shelf => (
-              <div key={shelf.id} className="bookshelf">
-                <h2 className="bookshelf-title">Currently Reading</h2>
-                <div className="bookshelf-books">
-                  <BookGrid books={books} shelf={shelf.id} />
-                </div>
+          {shelves.filter(shelf => shelf.id !== "none").map(shelf => (
+            <div key={shelf.id} className="bookshelf">
+              <h2 className="bookshelf-title">{shelf.title}</h2>
+              <div className="bookshelf-books">
+                <BookGrid books={books.filter(book => book.shelf === shelf.id)} />
               </div>
-            ))
-          }
+            </div>
+          ))}
         </div>
       </div>
     )
