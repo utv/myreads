@@ -1,24 +1,27 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+
 class BookGrid extends React.Component {
   static propTypes = {
-    books: PropTypes.array.isRequired
+    books: PropTypes.array.isRequired,
+    shelves: PropTypes.array.isRequired,
+    onUpdateBook: PropTypes.func.isRequired
   }
 
-  handleShelfChanger = (moveToShelf) => {
-    console.log(moveToShelf)
+  handleShelfChanger = (book, event) => {
+    this.props.onUpdateBook(book, event.target.value)
   }
 
   render() {
-    const { books } = this.props
-    const shelves = [
+    const { books, shelves } = this.props
+    /* const shelves = [
       { id: "moveTo", title: "Move to..." },
       { id: "wantToRead", title: "Want to Read" },
       { id: "currentlyReading", title: "Currently Reading" },
       { id: "read", title: "Want to Read" },
       { id: "none", title: "None" }
-    ]
+    ] */
 
     return (
       <ol className="books-grid">
@@ -26,18 +29,19 @@ class BookGrid extends React.Component {
           <li key={book.id}>
             <div className="book">
               <div className="book-top">
-                <div className="book-cover"
-                  style={{
-                    width: 128,
-                    height: 193,
-                    backgroundImage: `url(${book.imageLinks.thumbnail})`
-                  }}
-                >
-                </div>
+                {book.imageLinks &&
+                  <div className="book-cover"
+                    style={{
+                      width: 128,
+                      height: 193,
+                      backgroundImage: `url(${book.imageLinks.thumbnail})`
+                    }}
+                  >
+                  </div>}
                 <div className="book-shelf-changer">
                   <select
-                    onChange={(e) => this.handleShelfChanger(e.target.value)}
-                    value={book.shelf}
+                    onChange={this.handleShelfChanger.bind(this, book)}
+                    value={book.shelf ? book.shelf : 'none'}
                   >
                     {shelves.map((shelf, index) => (
                       <option
@@ -52,7 +56,7 @@ class BookGrid extends React.Component {
                 </div>
               </div>
               <div className="book-title">{book.title}</div>
-              {book.authors.map(author => (
+              {book.authors && book.authors.map(author => (
                 <div key={author} className="book-authors">{author}</div>
               ))}
             </div>
