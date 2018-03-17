@@ -47,7 +47,6 @@ class BooksApp extends React.Component {
       this.setState({ searchedBooks: [] })
     else
       BooksAPI.search(query).then(searchedBooks => {
-        console.log('searchedBooks ', searchedBooks)
         if (!searchedBooks.error)
           this.setState({ searchedBooks: searchedBooks })
       })
