@@ -15,14 +15,6 @@ class BookGrid extends React.Component {
 
   render() {
     const { books, shelves } = this.props
-    /* const shelves = [
-      { id: "moveTo", title: "Move to..." },
-      { id: "wantToRead", title: "Want to Read" },
-      { id: "currentlyReading", title: "Currently Reading" },
-      { id: "read", title: "Want to Read" },
-      { id: "none", title: "None" }
-    ] */
-
     return (
       <ol className="books-grid">
         {books.map(book => (

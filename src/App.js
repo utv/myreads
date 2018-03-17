@@ -18,30 +18,40 @@ class BooksApp extends React.Component {
     })
   }
 
-  addShelf = (books, bookToUpdate, newShelf) => books.map((book) => {
-    if (book.id === bookToUpdate.id)
-      book.shelf = newShelf
-    return book
-  })
+  assignToShelf = (books, bookToUpdate, newShelf) =>
+    books.map((book) => {
+      if (book.id === bookToUpdate.id)
+        book.shelf = newShelf
+      return book
+    })
+
+  addToShelf = (books, bookToUpdate, newShelf) => {
+    const newBooks = books.find(book => book.id === bookToUpdate.id)
+      ? books
+      : books.concat(bookToUpdate)
+    return this.assignToShelf(newBooks, bookToUpdate, newShelf)
+      .filter(book => book.shelf !== 'none')
+  }
 
   updateBook = (bookToUpdate, newShelf) => {
     BooksAPI.update(bookToUpdate, newShelf)
     this.setState((prevState) => ({
-      books: this.addShelf(prevState.books, bookToUpdate, newShelf)
+      books: this.addToShelf(prevState.books, bookToUpdate, newShelf)
     }))
   }
 
+  // update both MyReads and Search pages
   updateSearchedBook = (bookToUpdate, newShelf) => {
     BooksAPI.update(bookToUpdate, newShelf)
-    this.setState((prevState) => ({
-      books: this.addShelf(prevState.books, bookToUpdate, newShelf),
-      searchedBooks: this.addShelf(prevState.searchedBooks, bookToUpdate, newShelf)
-    }))
+    this.setState((prevState) => {
+      return {
+        books: this.addToShelf(prevState.books, bookToUpdate, newShelf),
+        searchedBooks: this.assignToShelf(prevState.searchedBooks, bookToUpdate, newShelf)
+      }
+    })
   }
 
-  clearSearchedBooks = () => {
-    this.setState({ searchedBooks: [] })
-  }
+  clearSearchedBooks = () => this.setState({ searchedBooks: [] })
 
   searchBook(query) {
     // if books in search result are also in books state, 
@@ -55,11 +65,12 @@ class BooksApp extends React.Component {
           this.clearSearchedBooks()
         else
           this.setState((prevState) => ({
-            searchedBooks: searchedBooks.map((search) => {
-              const match = prevState.books.filter((aBookOnShelf) => aBookOnShelf.id === search.id)
+            searchedBooks: searchedBooks.map((searchResult) => {
+              const match =
+                prevState.books.filter((aBookOnShelf) => aBookOnShelf.id === searchResult.id)
               if (match.length)
-                search.shelf = match[0].shelf
-              return search
+                searchResult.shelf = match[0].shelf
+              return searchResult
             })
           }))
       })
@@ -109,6 +120,7 @@ class BooksApp extends React.Component {
               <Link className='close-search' to='/' onClick={this.clearSearchedBooks}>Close</Link>
               <div className="search-books-input-wrapper">
                 <input type="text"
+                  autoFocus
                   placeholder="Search by title or author"
                   // value={this.state.query}
                   onChange={(e) => this.searchBook(e.target.value)}
