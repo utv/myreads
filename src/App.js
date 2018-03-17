@@ -2,12 +2,11 @@ import React from 'react'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
 import { Route, Link } from 'react-router-dom'
-// import Shelves from './Shelves'
 import BookGrid from './BookGrid'
+import Search from './Search'
 
 class BooksApp extends React.Component {
   state = {
-    // query: '',
     books: [],
     searchedBooks: []
   }
@@ -18,6 +17,7 @@ class BooksApp extends React.Component {
     })
   }
 
+  // if a book doesn't have shelf, add one
   assignToShelf = (books, bookToUpdate, newShelf) =>
     books.map((book) => {
       if (book.id === bookToUpdate.id)
@@ -25,6 +25,7 @@ class BooksApp extends React.Component {
       return book
     })
 
+  // add shelf to a book and remove from a book list if shelf is 'none'
   addToShelf = (books, bookToUpdate, newShelf) => {
     const newBooks = books.find(book => book.id === bookToUpdate.id)
       ? books
@@ -33,6 +34,7 @@ class BooksApp extends React.Component {
       .filter(book => book.shelf !== 'none')
   }
 
+  // update books on the server and UI
   updateBook = (bookToUpdate, newShelf) => {
     BooksAPI.update(bookToUpdate, newShelf)
     this.setState((prevState) => ({
@@ -40,39 +42,14 @@ class BooksApp extends React.Component {
     }))
   }
 
-  // update both MyReads and Search pages
-  updateSearchedBook = (bookToUpdate, newShelf) => {
-    BooksAPI.update(bookToUpdate, newShelf)
-    this.setState((prevState) => {
-      return {
-        books: this.addToShelf(prevState.books, bookToUpdate, newShelf),
-        searchedBooks: this.assignToShelf(prevState.searchedBooks, bookToUpdate, newShelf)
-      }
-    })
-  }
-
-  clearSearchedBooks = () => this.setState({ searchedBooks: [] })
-
-  searchBook(query) {
-    // if books in search result are also in books state, 
-    // then add key 'shelf' to search result
-    if (!query)
-      this.clearSearchedBooks()
+  searchBook = (query) => {
+    if (query === '')
+      this.setState({ searchedBooks: [] })
     else
       BooksAPI.search(query).then(searchedBooks => {
-        // console.log('query ', searchedBooks)
-        if (searchedBooks.error)
-          this.clearSearchedBooks()
-        else
-          this.setState((prevState) => ({
-            searchedBooks: searchedBooks.map((searchResult) => {
-              const match =
-                prevState.books.filter((aBookOnShelf) => aBookOnShelf.id === searchResult.id)
-              if (match.length)
-                searchResult.shelf = match[0].shelf
-              return searchResult
-            })
-          }))
+        console.log('searchedBooks ', searchedBooks)
+        if (!searchedBooks.error)
+          this.setState({ searchedBooks: searchedBooks })
       })
   }
 
@@ -85,6 +62,7 @@ class BooksApp extends React.Component {
       { id: "none", title: "None" }
     ]
     const { books, searchedBooks } = this.state
+
     return (
       <div className="app">
         <Route exact path='/' render={() => (
@@ -102,7 +80,7 @@ class BooksApp extends React.Component {
                         <BookGrid
                           books={books.filter(book => book.shelf === shelf.id)}
                           shelves={shelves}
-                          onUpdateBook={this.updateBook}
+                          onBookUpdated={this.updateBook}
                         />
                       </div>
                     </div>
@@ -115,26 +93,13 @@ class BooksApp extends React.Component {
           </div>
         )} />
         <Route path='/search' render={() => (
-          <div className="search-books">
-            <div className="search-books-bar">
-              <Link className='close-search' to='/' onClick={this.clearSearchedBooks}>Close</Link>
-              <div className="search-books-input-wrapper">
-                <input type="text"
-                  autoFocus
-                  placeholder="Search by title or author"
-                  // value={this.state.query}
-                  onChange={(e) => this.searchBook(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="search-books-results">
-              <BookGrid
-                books={searchedBooks}
-                shelves={shelves}
-                onUpdateBook={this.updateSearchedBook}
-              />
-            </div>
-          </div>
+          <Search
+            searchResults={searchedBooks}
+            books={books}
+            shelves={shelves}
+            onBookUpdated={this.updateBook}
+            onQueryChange={this.searchBook}
+          />
         )} />
       </div>
     )

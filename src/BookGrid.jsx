@@ -6,11 +6,11 @@ class BookGrid extends React.Component {
   static propTypes = {
     books: PropTypes.array.isRequired,
     shelves: PropTypes.array.isRequired,
-    onUpdateBook: PropTypes.func.isRequired
+    onBookUpdated: PropTypes.func.isRequired
   }
 
   handleShelfChanger = (book, event) => {
-    this.props.onUpdateBook(book, event.target.value)
+    this.props.onBookUpdated(book, event.target.value)
   }
 
   render() {
