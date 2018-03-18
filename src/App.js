@@ -4,6 +4,7 @@ import './App.css'
 import { Route, Link } from 'react-router-dom'
 import BookGrid from './BookGrid'
 import Search from './Search'
+import * as Constants from './Constants'
 
 class BooksApp extends React.Component {
   state = {
@@ -56,15 +57,7 @@ class BooksApp extends React.Component {
   }
 
   render() {
-    const shelves = [
-      { id: "moveTo", title: "Move to..." },
-      { id: "wantToRead", title: "Want to Read" },
-      { id: "currentlyReading", title: "Currently Reading" },
-      { id: "read", title: "Read" },
-      { id: "none", title: "None" }
-    ]
     const { books, searchedBooks } = this.state
-
     return (
       <div className="app">
         <Route exact path='/' render={() => (
@@ -74,14 +67,14 @@ class BooksApp extends React.Component {
             </div>
             <div className="list-books-content">
               <div>
-                {shelves.filter(shelf => shelf.id !== "none" && shelf.id !== "moveTo")
+                {Constants.shelves.filter(shelf => shelf.id !== "none" && shelf.id !== "moveTo")
                   .map(shelf => (
                     <div key={shelf.id} className="bookshelf">
                       <h2 className="bookshelf-title">{shelf.title}</h2>
                       <div className="bookshelf-books">
                         <BookGrid
                           books={books.filter(book => book.shelf === shelf.id)}
-                          shelves={shelves}
+                          shelves={Constants.shelves}
                           onBookUpdated={this.updateBook}
                         />
                       </div>
@@ -98,7 +91,7 @@ class BooksApp extends React.Component {
           <Search
             searchResults={searchedBooks}
             books={books}
-            shelves={shelves}
+            shelves={Constants.shelves}
             onBookUpdated={this.updateBook}
             onQueryChange={this.searchBook}
           />
