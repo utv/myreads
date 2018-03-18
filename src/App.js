@@ -19,7 +19,7 @@ class BooksApp extends React.Component {
 
   // if a book doesn't have shelf, add one
   assignToShelf = (books, bookToUpdate, newShelf) => {
-    books.map((book) => {
+    return books.map((book) => {
       if (book.id === bookToUpdate.id)
         book.shelf = newShelf
       return book
@@ -38,7 +38,7 @@ class BooksApp extends React.Component {
   // update books on the server and UI
   updateBook = (bookToUpdate, newShelf) => {
     BooksAPI.update(bookToUpdate, newShelf).then(res =>
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         books: this.addToShelf(prevState.books, bookToUpdate, newShelf)
       })))
   }
