@@ -9,8 +9,8 @@ class BookGrid extends React.Component {
     onBookUpdated: PropTypes.func.isRequired
   }
 
-  handleShelfChanger = (book, event) => {
-    this.props.onBookUpdated(book, event.target.value)
+  handleShelfChanger = (book, shelf) => {
+    this.props.onBookUpdated(book, shelf)
   }
 
   render() {
@@ -32,14 +32,14 @@ class BookGrid extends React.Component {
                   </div>}
                 <div className="book-shelf-changer">
                   <select
-                    onChange={this.handleShelfChanger.bind(this, book)}
+                    onChange={e => this.handleShelfChanger(book, e.target.value)}
                     value={book.shelf ? book.shelf : 'none'}
                   >
                     {shelves.map((shelf, index) => (
                       <option
                         key={shelf.id}
                         value={shelf.id}
-                        disabled={index === 0 ? true : false}
+                        disabled={index === 0}
                       >
                         {shelf.title}
                       </option>
